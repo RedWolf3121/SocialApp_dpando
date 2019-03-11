@@ -4,18 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.activity.MediaActivity"
-    android:background="#000000">
+    tools:context=".view.activity.ShowPostActivity">
 
-    <VideoView
-        android:id="@+id/videoView"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints" />
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints" />
-
+        tools:ignore="MissingConstraints"
+        android:id="@+id/author"/>
 </android.support.constraint.ConstraintLayout>

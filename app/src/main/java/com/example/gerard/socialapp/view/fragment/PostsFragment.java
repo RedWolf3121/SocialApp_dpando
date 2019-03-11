@@ -8,12 +8,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.gerard.socialapp.GlideApp;
 import com.example.gerard.socialapp.R;
 import com.example.gerard.socialapp.model.Post;
-import com.example.gerard.socialapp.view.PostViewHolder;
 import com.example.gerard.socialapp.view.activity.MediaActivity;
+import com.example.gerard.socialapp.view.activity.ProfileActivity;
+import com.example.gerard.socialapp.view.activity.ShowPostActivity;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,10 +46,13 @@ public class PostsFragment extends Fragment {
 
         RecyclerView recycler = view.findViewById(R.id.rvPosts);
         recycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+
         recycler.setAdapter(new FirebaseRecyclerAdapter<Post, PostViewHolder>(options) {
             @Override
             public PostViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
                 LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
+
                 return new PostViewHolder(inflater.inflate(R.layout.item_post, viewGroup, false));
             }
 
@@ -55,6 +62,15 @@ public class PostsFragment extends Fragment {
 
                 viewHolder.author.setText(post.author);
                 GlideApp.with(PostsFragment.this).load(post.authorPhotoUrl).circleCrop().into(viewHolder.photo);
+
+                viewHolder.photo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(PostsFragment.this.getActivity(), ProfileActivity.class);
+                        intent.putExtra("uid",post.uid);
+                        startActivity(intent);
+                    }
+                });
 
                 if (post.likes.containsKey(mUser.getUid())) {
                     viewHolder.like.setImageResource(R.drawable.heart_on);
@@ -101,10 +117,59 @@ public class PostsFragment extends Fragment {
                         }
                     }
                 });
+
+                viewHolder.delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mReference.child("posts").child("data").child(postKey).setValue(null);
+                    }
+                });
+
+                viewHolder.photo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getActivity(),ProfileActivity.class);
+                        intent.putExtra("UID",post.uid);
+                        startActivity(intent);
+                    }
+                });
+
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getActivity(), ShowPostActivity.class);
+                        intent.putExtra("POSTKEY", postKey);
+                        startActivity(intent);
+                    }
+                });
             }
         });
 
         return view;
+    }
+
+    class PostViewHolder extends RecyclerView.ViewHolder {
+        public ImageView photo;
+        public TextView author;
+        public TextView content;
+        public ImageView image;
+        public ImageView like;
+        public TextView numLikes;
+        public LinearLayout likeLayout;
+        public ImageView delete;
+
+        public PostViewHolder(View item) {
+            super(item);
+
+            photo = item.findViewById(R.id.photo);
+            author = item.findViewById(R.id.author);
+            content = item.findViewById(R.id.content);
+            image = item.findViewById(R.id.image);
+            like = item.findViewById(R.id.like);
+            numLikes = item.findViewById(R.id.num_likes);
+            likeLayout = item.findViewById(R.id.like_layout);
+            delete = item.findViewById(R.id.delete);
+        }
     }
 
     Query setQuery(){
